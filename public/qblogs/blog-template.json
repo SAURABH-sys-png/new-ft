@@ -1,0 +1,43 @@
+{
+  "title": "Blog Title Here",
+  "category": "NDA",
+  "date": "2026-07-13",
+  "datetime": "2026-07-13",
+  "readTime": "5 min read",
+  "author": "Your Name",
+  "data": "This is the old plain-text fallback. It is still supported.",
+  "excerpt": "Short summary shown on the blog cards and in search results.",
+  "coverImage": "https://example.com/cover-image.jpg",
+  "content": [
+    {
+      "type": "paragraph",
+      "text": "The first paragraph of the article. Use this for normal body text."
+    },
+    {
+      "type": "heading",
+      "text": "Main Section Heading"
+    },
+    {
+      "type": "paragraph",
+      "text": "Add another paragraph under the section."
+    },
+    {
+      "type": "quote",
+      "text": "A short quote or highlight that should stand out."
+    },
+    {
+      "type": "image",
+      "src": "https://example.com/example-image.jpg",
+      "alt": "Describe the image for accessibility",
+      "caption": "Optional image caption"
+    },
+    {
+      "type": "list",
+      "content": [
+        "Point one",
+        "Point two",
+        "Point three"
+      ]
+    }
+  ]
+}
