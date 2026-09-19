@@ -60,26 +60,30 @@ export const getExams = () => apiFetch('/api/users/exams');
 
 export const getTests = () => apiFetch('/api/users/tests');
 
-export const getQuestion = (qsId) => apiFetch(`/api/users/questions/${qsId}`);
-
-// Test session routes
-export const startTest = (testId) =>
-  apiFetch('/api/users/tests/start', {
+// Test session routes (routes2.md spec)
+export const createTestSession = (testId) =>
+  apiFetch('/api/users/test-sessions', {
     method: 'POST',
     body: JSON.stringify({ testId }),
   });
 
-export const endTest = (sessionId) =>
-  apiFetch('/api/users/tests/end', {
-    method: 'POST',
-    body: JSON.stringify({ sessionId }),
+export const getTestSession = (sessionId) =>
+  apiFetch(`/api/users/test-sessions/${sessionId}`);
+
+export const saveAnswer = (sessionId, { questionId, selectedOption, timeSpentSeconds }) =>
+  apiFetch(`/api/users/test-sessions/${sessionId}/answers`, {
+    method: 'PATCH',
+    body: JSON.stringify({ questionId, selectedOption, timeSpentSeconds }),
   });
 
-export const updateTestProgress = (sessionId, updatedArr) =>
-  apiFetch('/api/users/tests/update', {
+export const submitTestSession = (sessionId, lastAnswer = null) =>
+  apiFetch(`/api/users/test-sessions/${sessionId}/submit`, {
     method: 'POST',
-    body: JSON.stringify({ sessionId, updatedArr }),
+    body: JSON.stringify(lastAnswer || {}),
   });
+
+export const getTestResult = (sessionId) =>
+  apiFetch(`/api/users/test-sessions/${sessionId}/result`);
 
 // Admin - Exams
 export const getAdminExams = () => apiFetch('/api/admin/exams');
@@ -92,6 +96,8 @@ export const getAdminTests = () => apiFetch('/api/admin/tests');
 export const createTest = (body) => apiFetch('/api/admin/tests', { method: 'POST', body: JSON.stringify(body) });
 export const updateTest = (uuid, body) => apiFetch(`/api/admin/tests/${uuid}`, { method: 'PUT', body: JSON.stringify(body) });
 export const deleteTest = (uuid) => apiFetch(`/api/admin/tests/${uuid}`, { method: 'DELETE' });
+export const publishTest = (uuid) => apiFetch(`/api/admin/tests/${uuid}/publish`, { method: 'PATCH' });
+export const unpublishTest = (uuid) => apiFetch(`/api/admin/tests/${uuid}/unpublish`, { method: 'PATCH' });
 
 // Admin - Questions
 export const getAdminQuestions = () => apiFetch('/api/admin/questions');
@@ -104,9 +110,14 @@ export const getUsers = (params = {}) => {
   const query = new URLSearchParams(params).toString();
   return apiFetch(`/api/admin/users${query ? `?${query}` : ''}`);
 };
+export const getUser = (uuid) => apiFetch(`/api/admin/users/${uuid}`);
 export const updateUserRole = (uuid, role) => apiFetch(`/api/admin/users/${uuid}/role`, { method: 'PUT', body: JSON.stringify({ role }) });
 export const updateUserActiveStatus = (uuid, isActive) => apiFetch(`/api/admin/users/${uuid}/active`, { method: 'PATCH', body: JSON.stringify({ isActive }) });
 export const deleteUser = (uuid) => apiFetch(`/api/admin/users/${uuid}`, { method: 'DELETE' });
+export const updateUserVerification = (uuid, data) => apiFetch(`/api/admin/users/${uuid}/verification`, { method: 'PATCH', body: JSON.stringify(data) });
+export const grantTestSeriesAccess = (uuid, data) => apiFetch(`/api/admin/users/${uuid}/test-series-access`, { method: 'POST', body: JSON.stringify(data) });
+export const revokeTestSeriesAccess = (uuid, testSeriesUuid) => apiFetch(`/api/admin/users/${uuid}/test-series-access/${testSeriesUuid}/revoke`, { method: 'PATCH' });
 
 // Admin - Analytics
 export const getPlatformAnalytics = () => apiFetch('/api/admin/analytics/platform');
+export const getUserAnalytics = (uuid) => apiFetch(`/api/admin/analytics/user/${uuid}`);

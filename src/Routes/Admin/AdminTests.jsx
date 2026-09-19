@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAdminTests, createTest, deleteTest, getAdminExams } from '../../hooks/api';
+import { getAdminTests, createTest, deleteTest, getAdminExams, publishTest, unpublishTest } from '../../hooks/api';
 
 export const AdminTests = () => {
   const [tests, setTests] = useState([]);
@@ -50,6 +50,19 @@ export const AdminTests = () => {
     }
   };
 
+  const handleTogglePublish = async (uuid, isPublished) => {
+    try {
+      if (isPublished) {
+        await unpublishTest(uuid);
+      } else {
+        await publishTest(uuid);
+      }
+      fetchData();
+    } catch (err) {
+      alert(err.message || 'Failed to update test status');
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -69,6 +82,7 @@ export const AdminTests = () => {
               <th className="px-6 py-3 font-semibold">Title</th>
               <th className="px-6 py-3 font-semibold">Exam</th>
               <th className="px-6 py-3 font-semibold">Duration (min)</th>
+              <th className="px-6 py-3 font-semibold">Status</th>
               <th className="px-6 py-3 font-semibold text-right">Actions</th>
             </tr>
           </thead>
@@ -85,6 +99,16 @@ export const AdminTests = () => {
                     <td className="px-6 py-4 font-medium text-gray-900">{test.title}</td>
                     <td className="px-6 py-4">{exam?.title || 'Unknown Exam'}</td>
                     <td className="px-6 py-4">{test.timeReq}</td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => handleTogglePublish(test.uuid, test.isPublished)}
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          test.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {test.isPublished ? 'Published' : 'Draft'}
+                      </button>
+                    </td>
                     <td className="px-6 py-4 text-right">
                       <button onClick={() => handleDelete(test.uuid)} className="text-red-600 hover:text-red-800 font-medium text-xs">Delete</button>
                     </td>

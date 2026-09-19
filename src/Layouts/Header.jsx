@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 export const Header = () => {
@@ -7,6 +7,15 @@ export const Header = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { user, isAuthenticated, logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const getNavLinkClass = (path) => {
+        const isActive = path === '/' ? location.pathname === '/' : (path !== '#' && location.pathname.startsWith(path));
+        const commonClass = "block py-3 px-4 rounded-lg md:p-0 transition-all";
+        const activeClass = "text-blue-700 bg-white md:bg-transparent md:text-white md:font-bold md:underline md:underline-offset-8 md:decoration-2";
+        const inactiveClass = "text-white hover:bg-blue-600 md:hover:bg-transparent md:hover:text-blue-200";
+        return `${commonClass} ${isActive ? activeClass : inactiveClass}`;
+    };
 
     const handleLogout = async () => {
         setIsUserMenuOpen(false);
@@ -90,22 +99,22 @@ export const Header = () => {
                 <div className={`items-center justify-between ${isMobileMenuOpen ? 'flex' : 'hidden'} w-full md:flex md:w-auto md:order-1 transition-all duration-300 ease-in-out`} id="navbar-user">
                     <ul className="w-full font-medium flex flex-col p-4 md:p-0 mt-4 border border-blue-500/30 rounded-xl bg-blue-800/95 backdrop-blur-md md:flex-row md:space-x-6 lg:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-transparent gap-2 md:gap-0 shadow-inner md:shadow-none">
                         <li>
-                            <a href="#" className="block py-3 px-4 text-blue-700 bg-white rounded-lg md:bg-transparent md:text-white md:p-0 md:font-bold md:underline md:underline-offset-8 md:decoration-2 transition-all">Home</a>
+                            <Link to="/" className={getNavLinkClass('/')} onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
                         </li>
                         <li>
-                            <a href="/sstories" className="block py-3 px-4 text-white rounded-lg hover:bg-blue-600 md:hover:bg-transparent md:hover:text-blue-200 md:p-0 transition-all">SSB Stories</a>
+                            <Link to="/sstories" className={getNavLinkClass('/sstories')} onClick={() => setIsMobileMenuOpen(false)}>SSB Stories</Link>
                         </li>
                         <li>
-                            <a href="#" className="block py-3 px-4 text-white rounded-lg hover:bg-blue-600 md:hover:bg-transparent md:hover:text-blue-200 md:p-0 transition-all">PYQs & Mocks</a>
+                            <Link to="#" className={getNavLinkClass('#')} onClick={() => setIsMobileMenuOpen(false)}>PYQs & Mocks</Link>
                         </li>
                         <li>
-                            <Link to="/test-series" className="block py-3 px-4 text-white rounded-lg hover:bg-blue-600 md:hover:bg-transparent md:hover:text-blue-200 md:p-0 transition-all">Test Series</Link>
+                            <Link to="/test-series" className={getNavLinkClass('/test-series')} onClick={() => setIsMobileMenuOpen(false)}>Test Series</Link>
                         </li>
                         <li>
-                            <a href="/calculator" className="block py-3 px-4 text-white rounded-lg hover:bg-blue-600 md:hover:bg-transparent md:hover:text-blue-200 md:p-0 transition-all">Eligibility Calculator</a>
+                            <Link to="/calculator" className={getNavLinkClass('/calculator')} onClick={() => setIsMobileMenuOpen(false)}>Eligibility Calculator</Link>
                         </li>
                         <li>
-                            <a href="#" className="block py-3 px-4 text-white rounded-lg hover:bg-blue-600 md:hover:bg-transparent md:hover:text-blue-200 md:p-0 transition-all">About</a>
+                            <Link to="#" className={getNavLinkClass('#')} onClick={() => setIsMobileMenuOpen(false)}>About</Link>
                         </li>
                     </ul>
                 </div>

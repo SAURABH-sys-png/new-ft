@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import { getExams, getTests } from '../../hooks/api';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getExams, getTests, createTestSession } from '../../hooks/api';
 
 export const TestsList = () => {
   const { examUuid } = useParams();
@@ -9,21 +9,21 @@ export const TestsList = () => {
   const [exam, setExam] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [startingTest, setStartingTest] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [allExams, allTests] = await Promise.all([getExams(), getTests()]);
-        const currentExam = allExams.find((e) => e.uuid === examUuid);
-        if (!currentExam) {
-          setError('Exam not found.');
-          setLoading(false);
-          return;
-        }
-        setExam(currentExam);
-        setTests(allTests.filter((t) => t.examUuid === examUuid));
+        const [examsData, testsData] = await Promise.all([getExams(), getTests()]);
+        const currentExam = examsData.find((e) => e.uuid === examUuid);
+        setExam(currentExam || null);
+        // Filter tests belonging to this exam and that are published
+        const examTests = testsData.filter(
+          (t) => t.examUuid === examUuid && t.isPublished
+        );
+        setTests(examTests);
       } catch (err) {
-        setError(err.message || 'Failed to load tests.');
+        setError(err.message || 'Failed to load tests');
       } finally {
         setLoading(false);
       }
@@ -31,112 +31,94 @@ export const TestsList = () => {
     fetchData();
   }, [examUuid]);
 
+  const handleStartTest = async (testUuid) => {
+    setStartingTest(testUuid);
+    setError('');
+    try {
+      const session = await createTestSession(testUuid);
+      navigate(`/test-session/${session.sessionId}`);
+    } catch (err) {
+      setError(err.message || 'Failed to start test');
+    } finally {
+      setStartingTest(null);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-24 pb-12 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center pt-20">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-gray-500">Loading tests…</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 pt-24 pb-12 px-4">
-        <div className="max-w-screen-xl mx-auto">
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-6 py-4 mt-8">
-            {error}
-          </div>
-          <Link to="/test-series" className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700 font-medium mt-4">
-            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to exams
-          </Link>
+          <div className="w-8 h-8 border-3 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
+          <p className="text-gray-500 text-sm">Loading tests…</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-12">
-      {/* Page header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-screen-xl mx-auto px-4 md:px-6 py-8 md:py-12">
-          <Link
-            to="/test-series"
-            className="inline-flex items-center text-sm text-gray-500 hover:text-blue-600 font-medium mb-4 transition-colors"
-          >
-            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            All exams
-          </Link>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
-            {exam?.title}
+    <div className="min-h-screen pt-24 pb-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Breadcrumb */}
+        <button
+          onClick={() => navigate('/test-series/explore')}
+          className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 text-sm mb-6 transition-colors font-medium"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Exams
+        </button>
+
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            {exam?.title || 'Tests'}
           </h1>
           {exam?.description && (
-            <p className="text-gray-500 mt-2 text-base max-w-2xl">{exam.description}</p>
+            <p className="text-gray-500 text-sm">{exam.description}</p>
           )}
         </div>
-      </div>
 
-      {/* Tests list */}
-      <div className="max-w-screen-xl mx-auto px-4 md:px-6 py-8 md:py-12">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-3 text-red-700 text-sm mb-6">
+            {error}
+          </div>
+        )}
+
         {tests.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-              </svg>
-            </div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">No tests available</h2>
-            <p className="text-sm text-gray-500">Tests for this exam haven't been added yet.</p>
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-12 text-center">
+            <svg className="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+            </svg>
+            <p className="text-gray-500 text-sm">No published tests available for this exam yet</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {tests.map((test, index) => (
+          <div className="space-y-3">
+            {tests.map((test) => (
               <div
                 key={test.uuid}
-                className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+                className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors"
               >
-                <div className="p-5 md:p-6 flex flex-col sm:flex-row sm:items-center gap-4">
-                  {/* Test number */}
-                  <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-bold text-blue-600">{String(index + 1).padStart(2, '0')}</span>
-                  </div>
-
-                  {/* Test info */}
-                  <div className="flex-grow min-w-0">
-                    <h3 className="text-base font-bold text-gray-900 truncate">{test.title}</h3>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5">
-                      <span className="inline-flex items-center text-xs text-gray-500">
-                        <svg className="w-3.5 h-3.5 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        {test.questions?.length || 0} questions
-                      </span>
-                      {test.timeReq && (
-                        <span className="inline-flex items-center text-xs text-gray-500">
-                          <svg className="w-3.5 h-3.5 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          {test.timeReq} min
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* CTA */}
-                  <button
-                    onClick={() => navigate(`/test-series/${examUuid}/${test.uuid}`)}
-                    className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-5 rounded-lg text-sm transition-colors duration-200 flex-shrink-0 whitespace-nowrap"
-                  >
-                    Start Test
-                  </button>
+                <div className="min-w-0">
+                  <h3 className="text-gray-900 font-semibold truncate">{test.title}</h3>
+                  <p className="text-gray-400 text-xs mt-1">
+                    {test.questions?.length || 0} question{test.questions?.length !== 1 ? 's' : ''}
+                  </p>
                 </div>
+                <button
+                  onClick={() => handleStartTest(test.uuid)}
+                  disabled={startingTest === test.uuid}
+                  className="shrink-0 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+                >
+                  {startingTest === test.uuid ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Starting…
+                    </span>
+                  ) : (
+                    'Start Test'
+                  )}
+                </button>
               </div>
             ))}
           </div>
