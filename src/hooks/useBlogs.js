@@ -15,7 +15,8 @@ export const useBlogs = () => {
       while (hasMore) {
         try {
           const response = await fetch(`/blogs/story_${i}.json`);
-          if (!response.ok) {
+          const contentType = response.headers.get('content-type') || '';
+          if (!response.ok || !contentType.includes('application/json')) {
             hasMore = false;
             break;
           }

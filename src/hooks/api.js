@@ -1,4 +1,5 @@
-const API_BASE = 'http://localhost:8080';
+const rawBase = import.meta.env?.VITE_API_BASE_URL ?? 'http://localhost:8080';
+const API_BASE = rawBase ? rawBase.replace(/\/api\/?$/, '').replace(/\/+$/, '') : '';
 
 export const apiFetch = async (path, options = {}) => {
   const token = localStorage.getItem('dr_token');
@@ -35,6 +36,115 @@ export const apiFetch = async (path, options = {}) => {
 
   return data;
 };
+
+// Calculate exact age in years & decimal months against target cut-off date (e.g. 2026-07-01)
+export function calculateExactAge(dobString, targetDateStr = '2026-07-01') {
+  const dob = new Date(dobString);
+  const targetDate = new Date(targetDateStr);
+  if (isNaN(dob.getTime())) return 0;
+
+  let years = targetDate.getFullYear() - dob.getFullYear();
+  let months = targetDate.getMonth() - dob.getMonth();
+  let days = targetDate.getDate() - dob.getDate();
+
+  if (days < 0) {
+    months -= 1;
+  }
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  return parseFloat((years + months / 12).toFixed(2));
+}
+
+export const SCHEMES_CATALOG = [
+  { id: 'nda-army', name: 'NDA Army Wing', group: 'NDA', type: '10+2', minAge: 15.5, maxAge: 18.5, requirements: ['12th pass (any stream)', 'Unmarried'] },
+  { id: 'nda-navy-af', name: 'NDA Navy & Air Force', group: 'NDA', type: '10+2', minAge: 15.5, maxAge: 19.5, requirements: ['12th pass with Physics & Maths (PCM)', 'Unmarried'] },
+  { id: 'tes-army', name: 'TES Army (10+2 Technical Entry)', group: 'Technical', type: '10+2', minAge: 16.5, maxAge: 19.5, requirements: ['10+2 PCM min 60%', 'JEE Main Rank Mandate', 'Male Only'] },
+  { id: 'btech-navy', name: '10+2 B.Tech Cadet Entry Scheme (Navy)', group: 'Technical', type: '10+2', minAge: 16.5, maxAge: 19.5, requirements: ['10+2 PCM min 70%', 'JEE Main Rank Mandate', 'Male Only'] },
+  { id: 'cds-ima', name: 'CDS IMA (Indian Military Academy)', group: 'CDS', type: 'Graduate', minAge: 19, maxAge: 24, requirements: ['Degree from recognized university', 'Male Only'] },
+  { id: 'cds-ina', name: 'CDS INA (Naval Academy)', group: 'CDS', type: 'Graduate', minAge: 19, maxAge: 24, requirements: ['Engineering degree (B.Tech/B.E.)', 'Male Only'] },
+  { id: 'cds-afa', name: 'CDS AFA (Air Force Academy)', group: 'CDS', type: 'Graduate', minAge: 20, maxAge: 24, requirements: ['Degree with Physics & Maths at 10+2 OR B.Tech'] },
+  { id: 'cds-ota', name: 'CDS OTA (Officer Training Academy)', group: 'CDS', type: 'Graduate', minAge: 19, maxAge: 25, requirements: ['Graduate from recognized university', 'Male & Female'] },
+  { id: 'afcat-flying', name: 'AFCAT Flying Branch', group: 'AFCAT', type: 'Graduate', minAge: 20, maxAge: 24, requirements: ['Graduate min 60% with PCM in 10+2 OR B.Tech min 60%'] },
+  { id: 'afcat-tech', name: 'AFCAT Ground Duty (Technical)', group: 'AFCAT', type: 'Graduate', minAge: 20, maxAge: 26, requirements: ['Four year degree in Engineering/Technology'] },
+  { id: 'afcat-nontech', name: 'AFCAT Ground Duty (Non-Technical)', group: 'AFCAT', type: 'Graduate', minAge: 20, maxAge: 26, requirements: ['Graduate min 60% in any discipline'] },
+  { id: 'tgc-army', name: 'TGC (Technical Graduate Course - Army)', group: 'Technical', type: 'Graduate', minAge: 20, maxAge: 27, requirements: ['Engineering Degree (B.Tech/B.E.)', 'Male Only'] },
+  { id: 'ssc-tech', name: 'SSC Tech (Army)', group: 'Technical', type: 'Graduate', minAge: 20, maxAge: 27, requirements: ['Engineering Degree in notified streams'] },
+  { id: 'ncc-special', name: 'NCC Special Entry Scheme', group: 'Special Entry', type: 'Graduate', minAge: 19, maxAge: 25, requirements: ['Graduate min 50%', 'NCC C Certificate with A/B grade'] },
+  { id: 'jag-entry', name: 'JAG (Judge Advocate General)', group: 'Special Entry', type: 'Graduate', minAge: 21, maxAge: 27, requirements: ['LLB Degree min 55%', 'CLAT PG Score'] },
+];
+
+export function checkEligibilityClient(input) {
+  const age = calculateExactAge(input.dob);
+
+  const results = SCHEMES_CATALOG.map((scheme) => {
+    let eligible = true;
+    const reasons = [];
+
+    if (age < scheme.minAge) {
+      eligible = false;
+      reasons.push(`Minimum age is ${scheme.minAge} years (your calculated age: ${age}).`);
+    } else if (age > scheme.maxAge) {
+      eligible = false;
+      reasons.push(`Upper age limit is ${scheme.maxAge} years (your calculated age: ${age}).`);
+    }
+
+    if (['nda-army', 'nda-navy-af', 'tes-army', 'btech-navy', 'cds-ima', 'cds-ina', 'tgc-army'].includes(scheme.id) && input.gender === 'Female') {
+      eligible = false;
+      reasons.push('This entry is reserved for male candidates in current notifications.');
+    }
+
+    if (['nda-navy-af', 'tes-army', 'btech-navy', 'afcat-flying'].includes(scheme.id) && input.stream !== 'PCM') {
+      eligible = false;
+      reasons.push('Requires Physics & Mathematics (PCM) at 10+2 level.');
+    }
+
+    if (['tes-army', 'btech-navy'].includes(scheme.id) && !input.hasJEE) {
+      eligible = false;
+      reasons.push('Mandatory JEE Main rank required for shortlisting.');
+    }
+
+    if (scheme.type === 'Graduate') {
+      if (input.degreeStatus === 'None') {
+        eligible = false;
+        reasons.push('Requires graduation or final year student status.');
+      }
+
+      if (['cds-ina', 'afcat-tech', 'tgc-army', 'ssc-tech'].includes(scheme.id) && input.degreeType !== 'B.Tech/B.E.') {
+        eligible = false;
+        reasons.push('Requires an eligible Engineering degree (B.Tech / B.E.).');
+      }
+
+      if (scheme.id === 'jag-entry' && input.degreeType !== 'LLB') {
+        eligible = false;
+        reasons.push('Requires an LLB degree (min 55% aggregate).');
+      }
+
+      if (scheme.id === 'ncc-special' && !input.hasNCC) {
+        eligible = false;
+        reasons.push("Requires an NCC 'C' Certificate with minimum 'B' Grade.");
+      }
+    }
+
+    const remainingAttempts = Math.max(0, Math.ceil((scheme.maxAge - age) * 2));
+
+    return {
+      ...scheme,
+      calculatedAge: age,
+      eligible: eligible && remainingAttempts > 0,
+      attemptsRemaining: eligible ? remainingAttempts : 0,
+      reason: reasons.length > 0 ? reasons.join(' ') : 'Meets all age, academic, and entry criteria!',
+    };
+  });
+
+  return {
+    calculatedAge: age,
+    dob: input.dob,
+    results,
+  };
+}
 
 // Auth
 export const authSignup = (body) =>
@@ -117,6 +227,9 @@ export const deleteUser = (uuid) => apiFetch(`/api/admin/users/${uuid}`, { metho
 export const updateUserVerification = (uuid, data) => apiFetch(`/api/admin/users/${uuid}/verification`, { method: 'PATCH', body: JSON.stringify(data) });
 export const grantTestSeriesAccess = (uuid, data) => apiFetch(`/api/admin/users/${uuid}/test-series-access`, { method: 'POST', body: JSON.stringify(data) });
 export const revokeTestSeriesAccess = (uuid, testSeriesUuid) => apiFetch(`/api/admin/users/${uuid}/test-series-access/${testSeriesUuid}/revoke`, { method: 'PATCH' });
+
+// User Analytics
+export const getMyAnalytics = () => apiFetch('/api/users/analytics');
 
 // Admin - Analytics
 export const getPlatformAnalytics = () => apiFetch('/api/admin/analytics/platform');

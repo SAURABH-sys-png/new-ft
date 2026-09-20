@@ -1,0 +1,123 @@
+[
+  {
+    "id": "nda-1-2026-gat",
+    "title": "NDA (I) 2026 General Ability Test (GAT)",
+    "category": "PYQ",
+    "exam": "NDA",
+    "year": "2026",
+    "size": "3.4 MB",
+    "pdfUrl": "/pdfs/pyq/nda-1-2026-gat.pdf",
+    "description": "Official UPSC NDA 1 2026 General Ability Test question paper covering English, Physics, Chemistry, General Science, History, Geography, and Current Affairs.",
+    "subjects": ["English", "Physics", "Chemistry", "General Science", "History", "Geography", "Current Affairs"]
+  },
+  {
+    "id": "nda-1-2026-maths",
+    "title": "NDA (I) 2026 Mathematics Paper",
+    "category": "PYQ",
+    "exam": "NDA",
+    "year": "2026",
+    "size": "4.1 MB",
+    "pdfUrl": "/pdfs/pyq/nda-1-2026-maths.pdf",
+    "description": "UPSC NDA 1 2026 Mathematics paper with 120 questions covering Algebra, Trigonometry, Analytical Geometry, Differential Calculus, Integral Calculus, Vectors, and Statistics.",
+    "subjects": ["Algebra", "Trigonometry", "Geometry", "Calculus", "Statistics"]
+  },
+  {
+    "id": "nda-2-2025-gat",
+    "title": "NDA (II) 2025 General Ability Test",
+    "category": "PYQ",
+    "exam": "NDA",
+    "year": "2025",
+    "size": "3.8 MB",
+    "pdfUrl": "/pdfs/pyq/nda-2-2025-gat.pdf",
+    "description": "Complete GAT question paper for NDA 2 2025 with section-wise subject breakdown.",
+    "subjects": ["English", "General Knowledge", "Physics", "Chemistry", "History"]
+  },
+  {
+    "id": "nda-2-2025-gat-ans",
+    "title": "NDA (II) 2025 GAT Official Answer Key",
+    "category": "Answer Key",
+    "exam": "NDA",
+    "year": "2025",
+    "size": "1.2 MB",
+    "pdfUrl": "/pdfs/pyq/nda-2-2025-gat-ans.pdf",
+    "description": "Verified answer key with detailed solution hints for NDA 2 2025 GAT paper.",
+    "subjects": ["Answer Key", "Solutions"]
+  },
+  {
+    "id": "nda-2-2025-maths",
+    "title": "NDA (II) 2025 Mathematics Paper",
+    "category": "PYQ",
+    "exam": "NDA",
+    "year": "2025",
+    "size": "3.9 MB",
+    "pdfUrl": "/pdfs/pyq/nda-2-2025-maths.pdf",
+    "description": "Mathematics original question paper for UPSC NDA 2 2025.",
+    "subjects": ["Mathematics", "Calculus", "Algebra", "Trigonometry"]
+  },
+  {
+    "id": "nda-2-2025-maths-ans",
+    "title": "NDA (II) 2025 Mathematics Answer Key",
+    "category": "Answer Key",
+    "exam": "NDA",
+    "year": "2025",
+    "size": "1.1 MB",
+    "pdfUrl": "/pdfs/pyq/nda-2-2025-maths-ans.pdf",
+    "description": "Official step-by-step answer key for NDA 2 2025 Mathematics paper.",
+    "subjects": ["Answer Key", "Mathematics"]
+  },
+  {
+    "id": "cds-1-2026-english",
+    "title": "CDS (I) 2026 English Paper",
+    "category": "PYQ",
+    "exam": "CDS",
+    "year": "2026",
+    "size": "2.9 MB",
+    "pdfUrl": "/pdfs/pyq/cds-1-2026-english.pdf",
+    "description": "UPSC CDS 1 2026 English Language paper testing Reading Comprehension, Error Spotting, Synonyms, Antonyms, and Sentence Arrangement.",
+    "subjects": ["English", "Grammar", "Comprehension"]
+  },
+  {
+    "id": "cds-1-2026-gk",
+    "title": "CDS (I) 2026 General Knowledge Paper",
+    "category": "PYQ",
+    "exam": "CDS",
+    "year": "2026",
+    "size": "3.6 MB",
+    "pdfUrl": "/pdfs/pyq/cds-1-2026-gk.pdf",
+    "description": "UPSC CDS 1 2026 GK paper with questions on Indian Polity, Economy, History, Defense Technology, and International Events.",
+    "subjects": ["Polity", "Economy", "History", "Defense Tech", "Current Affairs"]
+  },
+  {
+    "id": "cds-1-2026-maths",
+    "title": "CDS (I) 2026 Elementary Mathematics",
+    "category": "PYQ",
+    "exam": "CDS",
+    "year": "2026",
+    "size": "3.2 MB",
+    "pdfUrl": "/pdfs/pyq/cds-1-2026-maths.pdf",
+    "description": "Elementary Mathematics paper for IMA, INA, and AFA candidates.",
+    "subjects": ["Arithmetic", "Algebra", "Mensuration", "Trigonometry"]
+  },
+  {
+    "id": "afcat-2-2025-full-mock",
+    "title": "AFCAT 2 2025 Full Length Mock Test",
+    "category": "Mock Test",
+    "exam": "AFCAT",
+    "year": "2025",
+    "size": "2.4 MB",
+    "pdfUrl": "/pdfs/mocks/afcat-2-2025-full-mock.pdf",
+    "description": "Full-length 100-question mock exam for Air Force Common Admission Test with EKT technical section.",
+    "subjects": ["Verbal Ability", "Numerical Ability", "Reasoning", "General Awareness"]
+  },
+  {
+    "id": "ssb-oir-practice-set-2026",
+    "title": "SSB OIR (Officer Intelligence Rating) Practice Set",
+    "category": "Mock Test",
+    "exam": "SSB",
+    "year": "2026",
+    "size": "1.8 MB",
+    "pdfUrl": "/pdfs/mocks/ssb-oir-practice-set.pdf",
+    "description": "Day 1 Screening OIR Verbal and Non-Verbal test booklet with timing rules.",
+    "subjects": ["Verbal Reasoning", "Non-Verbal Reasoning", "Cube Rotation", "Number Series"]
+  }
+]
