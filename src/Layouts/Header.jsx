@@ -114,7 +114,7 @@ export const Header = () => {
                             <Link to="/calculator" className={getNavLinkClass('/calculator')} onClick={() => setIsMobileMenuOpen(false)}>Eligibility Calculator</Link>
                         </li>
                         <li>
-                            <Link to="#" className={getNavLinkClass('#')} onClick={() => setIsMobileMenuOpen(false)}>About</Link>
+                            <Link to="/about" className={getNavLinkClass('/about')} onClick={() => setIsMobileMenuOpen(false)}>About</Link>
                         </li>
                     </ul>
                 </div>

@@ -63,7 +63,7 @@ export const ExamsList = () => {
             {exams.map((exam) => (
               <Link
                 key={exam.uuid}
-                to={`/test-series/${exam.uuid}`}
+                to={`/test-series/explore/${exam.uuid}`}
                 className="group bg-white hover:bg-gray-50 border border-gray-200 hover:border-blue-300 rounded-xl shadow-sm hover:shadow-md p-6 transition-all duration-200"
               >
                 <div className="flex items-start justify-between gap-3">

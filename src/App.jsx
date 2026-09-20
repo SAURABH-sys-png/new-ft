@@ -7,6 +7,7 @@ import { QBlogPost } from './Routes/Blog/QBlogPost';
 import DefenseCalculator from './Routes/Calculator/calculator';
 import { SStories } from './Routes/SStories/SStories';
 import { StoryPost } from './Routes/SStories/StoryPost';
+import { About } from './Routes/About/About';
 import { Login } from './Routes/TestSeries/Login';
 import { Signup } from './Routes/TestSeries/Signup';
 import { ForgotPassword } from './Routes/TestSeries/ForgotPassword';
@@ -39,6 +40,7 @@ function App() {
         <Route path="/qblog/:id" element={<QBlogPost />} />
         <Route path="/calculator" element={<DefenseCalculator />} />
         <Route path="/sstories" element={<SStories />} />
+        <Route path="/about" element={<About />} />
         <Route path="/sstory/:id" element={<StoryPost />} />
 
         {/* Auth routes */}
