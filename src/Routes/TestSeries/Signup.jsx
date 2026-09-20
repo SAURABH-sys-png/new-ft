@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { Logo } from '../../components/ui/Logo';
 
 export const Signup = () => {
   const { signup } = useAuth();
@@ -67,12 +68,11 @@ export const Signup = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 pt-20 pb-12">
       <div className="w-full max-w-md">
         {/* Header */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <img src="/logo.png" alt="DefenceRoger" className="h-10 w-10 rounded-full" />
-            <span className="text-2xl font-extrabold text-gray-900 font-logo">DefenceRoger</span>
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mt-2">Create your account</h1>
+        <div className="text-center mb-8 flex flex-col items-center">
+          <div className="mb-4">
+            <Logo size="lg" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2 tracking-tight">Create your account</h1>
           <p className="text-gray-500 mt-1 text-sm">Start preparing for your defence exams</p>
         </div>
 
